@@ -61,7 +61,7 @@ key_item_names = {
     "Life Bottle: Dan's Crypt - Behind Wall",
     "Life Bottle: Scarecrow Fields",
     "Life Bottle: Pools of the Ancient Dead",
-    "Life Bottle: Hall of Heroes (Ravenhooves The Archer )",
+    "Life Bottle: Hall of Heroes (Ravenhooves The Archer)",
     "Life Bottle: Hall of Heroes (Dirk Steadfast)",
     "Life Bottle: The Time Device",
     # skills
@@ -138,6 +138,36 @@ key_item_names = {
     "Time Rune: The Time Device",
 }
 
+_weapons = [
+    "Equipment: Small Sword",
+    "Equipment: Broadsword",
+    "Equipment: Magic Sword",
+    "Equipment: Club",
+    "Equipment: Hammer",
+    "Equipment: Daggers",
+    "Equipment: Axe",
+    "Equipment: Chicken Drumsticks",
+    "Equipment: Crossbow",
+    "Equipment: Longbow",
+    "Equipment: Fire Longbow", 
+    "Equipment: Magic Longbow", 
+    "Equipment: Spear",
+    "Equipment: Lightning"
+]
+
+_life_bottles= {
+    # life bottles
+    "Life Bottle: Dan's Crypt",
+    "Life Bottle: The Graveyard",
+    "Life Bottle: Hall of Heroes (Canny Tim)",
+    "Life Bottle: Dan's Crypt - Behind Wall",
+    "Life Bottle: Scarecrow Fields",
+    "Life Bottle: Pools of the Ancient Dead",
+    "Life Bottle: Hall of Heroes (Ravenhooves The Archer)",
+    "Life Bottle: Hall of Heroes (Dirk Steadfast)",
+    "Life Bottle: The Time Device"
+}
+
 
 _all_items: List[MedievilItemData] = [
     # Filler Items
@@ -187,7 +217,7 @@ _all_items: List[MedievilItemData] = [
     ("Equipment: Magic Longbow", 42, MedievilItemCategory.WEAPON, False),
     ("Equipment: Spear", 43, MedievilItemCategory.WEAPON, False),
     ("Equipment: Lightning", 44, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Good Lightning", 45, MedievilItemCategory.WEAPON, False),
+    ("Equipment: Good Lightning", 45, MedievilItemCategory.WEAPON, True),
     ("Equipment: Copper Shield", 46, MedievilItemCategory.WEAPON, False),
     ("Equipment: Silver Shield", 47, MedievilItemCategory.WEAPON, False),
     ("Equipment: Gold Shield", 48, MedievilItemCategory.WEAPON, False),
