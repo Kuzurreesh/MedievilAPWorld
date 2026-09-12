@@ -182,7 +182,7 @@ location_tables = {
         MedievilLocationData("Gold Coins: Up Hill 1 - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Gold Coins: Up Hill 2 - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Gold Coins: Chest at Exit - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
-        MedievilLocationData("Book: A Guide to Covens", "Gold Shield Ammo (100)", MedievilLocationCategory.BOOK),
+        MedievilLocationData("Book: A Guide to Covens - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.BOOK),
         MedievilLocationData("Book: Breakables - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.BOOK),
         MedievilLocationData("Book: Club - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.BOOK),
         MedievilLocationData("Book: Destroy Boulder - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.BOOK),
@@ -295,7 +295,6 @@ location_tables = {
         MedievilLocationData("Chalice: Ant Hill", "Gold Shield Ammo (100)", MedievilLocationCategory.CHALICE_PICKUP),
     ],
     "Enchanted Earth": [
-        # Requires Shadow Talisman
         MedievilLocationData("Egg Drop 1 - EE", "Gold Shield Ammo (100)", MedievilLocationCategory.PROGRESSION),
         MedievilLocationData("Egg Drop 2 - EE", "Gold Shield Ammo (100)", MedievilLocationCategory.PROGRESSION),
         MedievilLocationData("Egg Drop 3 - EE", "Gold Shield Ammo (100)", MedievilLocationCategory.PROGRESSION),
@@ -619,6 +618,7 @@ location_tables = {
         MedievilLocationData("Chalice: Scarecrow Fields", "Gold Shield Ammo (100)", MedievilLocationCategory.CHALICE_PICKUP),
     ],
     "Sleeping Village Locked Items": [
+        # REQUIRES Crucifix
         MedievilLocationData("Energy Vial: Near Chalice - SV", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Gold Coins: Chest next to Chalice - SV", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Chalice: Sleeping Village", "Gold Shield Ammo (100)", MedievilLocationCategory.CHALICE_PICKUP),

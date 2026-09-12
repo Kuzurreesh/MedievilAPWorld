@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 from typing_extensions import override
 
 from BaseClasses import CollectionState, Entrance, Location
-from rule_builder.rules import CanReachLocation, Has, HasAll, Rule, True_, HasAny, HasFromList
+from rule_builder.rules import CanReachLocation, Has, HasAll, Rule, True_, HasAny, HasFromList, CanReachEntrance
 from .Options import IncludeAntHillInChecksToggle, IncludeChalicesInChecksToggle, BookSanityToggle, GargoyleSanityToggle, RuneSanityToggle
-from .Items import _weapons, _life_bottles
+from .Items import _weapons, _ranged_weapons, _life_bottles
 
 if TYPE_CHECKING:
     from . import MedievilWorld
@@ -25,8 +25,6 @@ def cleared(level: str) -> Rule:
 
 
 DARING_DASH = Has("Skill: Daring Dash")
-
-WEAPON = HasAny(*[weapon for weapon in _weapons])
 
 REQUIRED_SOULS = HasAll(*[f"Key Item: Soul Helmet {i}" for i in range(1, 9)])
 
@@ -148,7 +146,6 @@ def set_vanilla_level_progression(self: "MedievilWorld") -> None:
 
 
 def set_open_level_progression(self: "MedievilWorld") -> None:
-    self.set_rule(self.get_entrance("Map -> Hall of Heroes"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Map -> Dan's Crypt"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Map -> The Graveyard"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Map -> Return to the Graveyard"), cleared("Dan's Crypt"))
@@ -162,7 +159,7 @@ def set_open_level_progression(self: "MedievilWorld") -> None:
     self.set_rule(self.get_entrance("Map -> The Sleeping Village"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Map -> Pools of the Ancient Dead"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Map -> Asylum Grounds"), cleared("Dan's Crypt"))
-    self.set_rule(self.get_entrance("Map -> Inside the Asylum"), cleared("Dan's Crypt"))
+    self.set_rule(self.get_entrance("Map -> Inside the Asylum"), cleared("Dan's Crypt") & (HasAny(*[weapon for weapon in _weapons]) | weapon("Chicken Drumsticks")))
     self.set_rule(self.get_entrance("Map -> Enchanted Earth"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Map -> The Gallows Gauntlet"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Map -> The Haunted Ruins"), cleared("Dan's Crypt"))
@@ -217,8 +214,8 @@ def set_ant_hill_bash_rules(self: "MedievilWorld") -> None:
 
 def set_hall_of_heroes_progression(self: "MedievilWorld", max_chalice_count: int) -> None:
     # hall of heroes rules
-    self.set_rule(self.get_entrance("Map -> Hall of Heroes"), HasNumberOfChalices(1))
-    # Should also see if you can reach the exit of the level.
+    #self.set_rule(self.get_entrance("Map -> Hall of Heroes"), HasNumberOfChalices(1))
+    # With AtLeast from AP 0.6.8 and list of CanReachEntrance("Hall of Heroes", parent_region_name="Level") (set up in set_HoH_entrances) we can set these properly to check chalice + cleared
     for i in range(1, max_chalice_count + 1):
         location_name = f"Chalice Reward {i}"
         self.set_rule(self.get_location(location_name), HasNumberOfChalices(i))
@@ -265,15 +262,23 @@ def set_dash_locations(self: "MedievilWorld", locations: list[str]) -> None:
             continue
         layer_rule(self, self.get_location(location), DARING_DASH)
 
-def set_weapon_locations(self: "MedievilWorld", locations: list[str]) -> None:
+def set_weapon_locations(self: "MedievilWorld", locations: list[str], set: tuple[str]) -> None:
     for location in locations:
         if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_false and "Chalice:" in location:
             continue
-        layer_rule(self, self.get_location(location), WEAPON)
+        if self.options.gargoylesanity.value == GargoyleSanityToggle.option_false and "Gargoyle:" in location:
+            continue
+        if self.options.booksanity.value == BookSanityToggle.option_false and "Book:" in location:
+            continue
+        layer_rule(self, self.get_location(location), HasAny(*[weapon for weapon in set]))
 
 def set_golem_locations(self: "MedievilWorld", locations: list[str]) -> None:
     for location in locations:
         if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_false and "Chalice:" in location:
+            continue
+        if self.options.gargoylesanity.value == GargoyleSanityToggle.option_false and "Gargoyle:" in location:
+            continue
+        if self.options.booksanity.value == BookSanityToggle.option_false and "Book:" in location:
             continue
         layer_rule(self, self.get_location(location), DARING_DASH | weapon("Dragon Armour"))
 
@@ -284,88 +289,46 @@ def set_dragon_armour_locations(self: "MedievilWorld", locations: list[str]) -> 
         layer_rule(self, self.get_location(location), weapon("Dragon Armour"))
 
 
-def set_vanilla_runesanity_rules(self: "MedievilWorld") -> None:
-    print("Vanilla Runesanity being created: ")
-    layer_rule(
+def set_non_runesanity_rules(self: "MedievilWorld") -> None:
+    print("Non Runesanity being created: ")
+
+    set_rune_blocks(
         self,
-        self.get_entrance("Map -> The Graveyard"),
-        HasAll("Earth Rune: The Graveyard", "Chaos Rune: The Graveyard"),
+        [
+            "Gold Coins: Chest at Catapult 1 - HR",
+            "Gold Coins: Chest at Catapult 2 - HR",
+            "Gold Coins: Chest at Catapult 3 - HR",
+            "Book: Escape - HR",
+
+        ],
+        ["Key Item: King Peregrine's Crown"]
     )
-    layer_rule(
+
+    set_golem_locations(
         self,
-        self.get_entrance("Map -> The Hilltop Mausoleum"),
-        HasAll(
-            "Moon Rune: The Hilltop Mausoleum", "Earth Rune: The Hilltop Mausoleum", "Chaos Rune: The Hilltop Mausoleum"
-        ),
+        [
+            "Gold Coins: Chest at Catapult 1 - HR",
+            "Gold Coins: Chest at Catapult 2 - HR",
+            "Gold Coins: Chest at Catapult 3 - HR",
+            "Book: Escape - HR",
+
+        ]
+        
     )
-    layer_rule(
-        self, self.get_entrance("Map -> Return to the Graveyard"), Has("Star Rune: Return to the Graveyard")
-    )
-    layer_rule(
+
+    set_weapon_locations(
         self,
-        self.get_entrance("Map -> Enchanted Earth"),
-        HasAll("Earth Rune: Enchanted Earth", "Star Rune: Enchanted Earth"),
-    )
-    layer_rule(
-        self,
-        self.get_entrance("Map -> Scarecrow Fields"),
-        HasAll("Earth Rune: Scarecrow Fields", "Chaos Rune: Scarecrow Fields", "Moon Rune: Scarecrow Fields"),
-    )
-    layer_rule(
-        self,
-        self.get_entrance("Map -> The Sleeping Village"),
-        HasAll(
-            "Earth Rune: The Sleeping Village", "Chaos Rune: The Sleeping Village", "Moon Rune: The Sleeping Village"
-        ),
-    )
-    layer_rule(
-        self,
-        self.get_entrance("Map -> Pumpkin Gorge"),
-        HasAll(
-            "Earth Rune: Pumpkin Gorge",
-            "Chaos Rune: Pumpkin Gorge",
-            "Moon Rune: Pumpkin Gorge",
-            "Time Rune: Pumpkin Gorge",
-            "Star Rune: Pumpkin Gorge",
-        ),
-    )
-    layer_rule(self, self.get_entrance("Map -> Asylum Grounds"), Has("Chaos Rune: The Asylum Grounds"))
-    layer_rule(self, self.get_entrance("Map -> Inside the Asylum"), Has("Earth Rune: Inside the Asylum"))
-    layer_rule(
-        self, self.get_entrance("Map -> Pools of the Ancient Dead"), Has("Chaos Rune: Pools of the Ancient Dead")
-    )
-    layer_rule(
-        self,
-        self.get_entrance("Map -> The Lake"),
-        HasAll("Chaos Rune: The Lake", "Earth Rune: The Lake", "Star Rune: The Lake", "Time Rune: The Lake"),
-    )
-    layer_rule(
-        self,
-        self.get_entrance("Map -> The Crystal Caves"),
-        HasAll("Earth Rune: The Crystal Caves", "Star Rune: The Crystal Caves"),
-    )
-    layer_rule(self, self.get_entrance("Map -> The Gallows Gauntlet"), Has("Star Rune: The Gallows Gauntlet"))
-    layer_rule(
-        self,
-        self.get_entrance("Map -> The Haunted Ruins"),
-        HasAll("Chaos Rune: The Haunted Ruins", "Earth Rune: The Haunted Ruins"),
-    )
-    layer_rule(
-        self,
-        self.get_entrance("Map -> The Ghost Ship"),
-        HasAll("Chaos Rune: Ghost Ship", "Moon Rune: Ghost Ship", "Star Rune: Ghost Ship"),
-    )
-    layer_rule(
-        self,
-        self.get_entrance("Map -> The Time Device"),
-        HasAll(
-            "Chaos Rune: The Time Device", "Earth Rune: The Time Device", "Moon Rune: The Time Device", "Time Rune: The Time Device"
-        ),
+        [
+            
+            "Cleared: Enchanted Earth"
+
+        ], _ranged_weapons
+
     )
 
 
 def set_runesanity_rules(self: "MedievilWorld") -> None:
-    print(" Open Runesanity being created: ")
+    print("Runesanity being created: ")
     # Dan's Crypt
     set_rune_blocks(self, ["Book: Track Down Zarok - DC","Cleared: Dan's Crypt"], ["Star Rune: Dan's Crypt"])
 
@@ -872,8 +835,9 @@ def set_runesanity_rules(self: "MedievilWorld") -> None:
         ["Time Rune: The Time Device","Chaos Rune: The Time Device","Earth Rune: The Time Device"],
     )
 
-def set_weapon_dependencies(self: "MedievilWorld") -> None:
 
+
+def set_weapon_dependencies(self: "MedievilWorld") -> None:
     set_dash_locations(
         self,
         [
@@ -888,7 +852,11 @@ def set_weapon_dependencies(self: "MedievilWorld") -> None:
         [
             "Equipment: Club - CH",
             "Book: Club - CH",
-            "Book: A Guide to Covens",
+            "Book: A Guide to Covens - CH",
+            "Energy Vial: Right Coffin - HM",
+            "Book: Thieving Imps - HM",
+            "Energy Vial: Near Rune on Left Ramp - HM",
+            "Earth Rune: The Hilltop Mausoleum",
             "Gargoyle: Witch Cave - CH",
             "Chaos Rune: The Hilltop Mausoleum",
             "Moon Rune: The Hilltop Mausoleum",
@@ -957,27 +925,6 @@ def set_weapon_dependencies(self: "MedievilWorld") -> None:
         ],
     )
 
-    set_weapon_locations(
-        self,
-        [
-            "Energy Vial: Left at Merchant Gargoyle - PS",
-            "Energy Vial: Right at Merchant Gargoyle - PS",
-            "Gold Coins: Chest at Merchant Gargoyle - PS",
-            "Chalice: Pumpkin Serpent",
-            "Cleared: Pumpkin Serpent",
-            "Chalice: The Entrance Hall",
-
-        ],
-    )
-
-    set_golem_locations(
-        self,
-        [
-            "Chalice: The Haunted Ruins",
-            "Cleared: The Haunted Ruins"
-        ],
-    )
-
     set_dragon_armour_locations(
         self,
         [
@@ -989,19 +936,68 @@ def set_weapon_dependencies(self: "MedievilWorld") -> None:
         ],
     )
 
+    # All weapons without drumstick
+    set_weapon_locations(
+        self,
+        [
+            "Gargoyle: Exit - RTG",
+            "Skill: Daring Dash",
+            "Cleared: Return to the Graveyard",
+            "Energy Vial: Left at Merchant Gargoyle - PS",
+            "Energy Vial: Right at Merchant Gargoyle - PS",
+            "Gold Coins: Chest at Merchant Gargoyle - PS",
+            "Key Item: Dragon Gem - PS",
+            "Chalice: Pumpkin Serpent",
+            "Chalice: The Entrance Hall",
+            "Cleared: Pumpkin Serpent",
+            "Cleared: Zaroks Lair"
+
+        ], _weapons
+    )
+
+    # Ranged weapons
+    set_weapon_locations(
+        self,
+        [
+            "Cleared: The Hilltop Mausoleum",
+            "Key Item: Skull Key - HM",
+            "Gold Coins: Chest Left of Fountain - EE",
+            "Gold Coins: Chest Top of Fountain - EE",
+            "Gold Coins: Chest Right of Fountain - EE",
+            "Energy Vial: Left of Tree Drop - EE",
+            "Energy Vial: Right of Tree Drop - EE",
+            "Chalice: Enchanted Earth"
+
+        ], _ranged_weapons
+    )
+
+    set_golem_locations(
+        self,
+        [
+            "Chalice: The Haunted Ruins",
+            "Cleared: The Haunted Ruins"
+        ],
+    )    
+
+   
+
+
 def set_key_item_dependencies(self: "MedievilWorld") -> None:
     """Base-game key-item dependencies, applied in every mode."""
     self.set_rule(self.get_location("Key Item: Shadow Artefact - SV"), key_items("Safe Key"))
     self.set_rule(self.get_location("Key Item: Crucifix - SV"), key_items("Landlords Bust", "Crucifix Cast"))
     self.set_rule(self.get_location("Cleared: Pools of the Ancient Dead"), REQUIRED_SOULS)
-    self.set_rule(self.get_location("Key Item: Dragon Gem - PS"), key_items("Witches Talisman") & HasAny(*[weapon for weapon in _weapons]))
+    self.set_rule(self.get_location("Key Item: Dragon Gem - PS"), key_items("Witches Talisman"))
     self.set_rule(self.get_location("Earth Rune: The Haunted Ruins"), key_items("King Peregrine's Crown"))
+    self.set_rule(self.get_location("Cleared: The Haunted Ruins"), key_items("King Peregrine's Crown"))
     if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_true:
-        self.set_rule(self.get_location("Chalice: The Haunted Ruins"), key_items("King Peregrine's Crown"))    
+        self.set_rule(self.get_location("Chalice: The Haunted Ruins"), key_items("King Peregrine's Crown"))   
         self.set_rule(self.get_location("Chalice: Sleeping Village"), CanReachLocation("Key Item: Landlords Bust - SV"))
+        set_weapon_locations(self,['Chalice: The Entrance Hall'],_weapons)
         if self.options.runesanity.value == RuneSanityToggle.option_true:
             self.set_rule(self.get_location("Chalice: Ghost Ship"), Has("Moon Rune: Ghost Ship") | weapon("Club")) 
-    self.set_rule(self.get_location("Cleared: The Haunted Ruins"), key_items("King Peregrine's Crown"))
+        else:
+            self.set_rule(self.get_location("Chalice: Ghost Ship"), weapon("Club")) 
     self.set_rule(self.get_location("Cleared: Ghost Ship"), weapon("Club")) 
     self.set_rule(self.get_location("Cleared: Zaroks Lair"), weapon("Good Lightning") & HasFromList(*_life_bottles, count=5))
     self.set_rule(self.get_location("Cleared: Sleeping Village"), CanReachLocation("Key Item: Landlords Bust - SV"))
@@ -1019,5 +1015,30 @@ def set_locked_items_locations(self: "MedievilWorld") -> None:
     self.set_rule(self.get_entrance("Scarecrow Fields -> Scarecrow Fields Locked Items"), key_items("Harvester Parts"))
     self.set_rule(self.get_entrance("The Sleeping Village -> Sleeping Village Locked Items"), key_items("Crucifix"))
     self.set_rule(self.get_entrance("Enchanted Earth -> Enchanted Earth Locked Items"), key_items("Shadow Artefact","Shadow Talisman"))
+
+
+def set_HoH_entrances(self: "MedievilWorld") -> None:
+    self.set_rule(self.get_entrance("The Graveyard -> Hall of Heroes"),cleared("The Graveyard") & CanReachLocation("Chalice: The Graveyard"))
+    self.set_rule(self.get_entrance("Return to the Graveyard -> Hall of Heroes"),cleared("Return to the Graveyard") & CanReachLocation("Chalice: Return to the Graveyard"))
+    self.set_rule(self.get_entrance("Cemetery Hill -> Hall of Heroes"),cleared("Cemetery Hill") & CanReachLocation("Chalice: Cemetery Hill"))
+    self.set_rule(self.get_entrance("The Hilltop Mausoleum -> Hall of Heroes"),cleared("The Hilltop Mausoleum") & CanReachLocation("Chalice: The Hilltop Mausoleum"))
+    self.set_rule(self.get_entrance("Scarecrow Fields -> Hall of Heroes"),cleared("Scarecrow Fields") & CanReachLocation("Chalice: Scarecrow Fields"))
+    self.set_rule(self.get_entrance("The Crystal Caves -> Hall of Heroes"),cleared("The Crystal Caves") & CanReachLocation("Chalice: The Crystal Caves"))
+    self.set_rule(self.get_entrance("The Lake -> Hall of Heroes"),cleared("The Lake") & CanReachLocation("Chalice: The Lake"))
+    self.set_rule(self.get_entrance("Pumpkin Gorge -> Hall of Heroes"),cleared("Pumpkin Gorge") & CanReachLocation("Chalice: Pumpkin Gorge"))
+    self.set_rule(self.get_entrance("Pumpkin Serpent -> Hall of Heroes"),cleared("Pumpkin Serpent") & CanReachLocation("Chalice: Pumpkin Serpent"))
+    self.set_rule(self.get_entrance("The Sleeping Village -> Hall of Heroes"),cleared("Sleeping Village") & CanReachLocation("Chalice: Sleeping Village"))
+    self.set_rule(self.get_entrance("Pools of the Ancient Dead -> Hall of Heroes"),cleared("Pools of the Ancient Dead") & CanReachLocation("Chalice: Pools of the Ancient Dead"))
+    self.set_rule(self.get_entrance("Asylum Grounds -> Hall of Heroes"),cleared("Asylum Grounds") & CanReachLocation("Chalice: Asylum Grounds"))
+    self.set_rule(self.get_entrance("Inside the Asylum -> Hall of Heroes"),cleared("Inside the Asylum") & CanReachLocation("Chalice: Inside the Asylum"))
+    self.set_rule(self.get_entrance("Enchanted Earth -> Hall of Heroes"),cleared("Enchanted Earth") & CanReachLocation("Chalice: Enchanted Earth"))
+    self.set_rule(self.get_entrance("The Gallows Gauntlet -> Hall of Heroes"),cleared("The Gallows Gauntlet") & CanReachLocation("Chalice: The Gallows Gauntlet"))
+    self.set_rule(self.get_entrance("The Haunted Ruins -> Hall of Heroes"),cleared("The Haunted Ruins") & CanReachLocation("Chalice: The Haunted Ruins"))
+    self.set_rule(self.get_entrance("The Ghost Ship -> Hall of Heroes"),cleared("Ghost Ship") & CanReachLocation("Chalice: Ghost Ship"))
+    self.set_rule(self.get_entrance("The Entrance Hall -> Hall of Heroes"),cleared("The Entrance Hall") & CanReachLocation("Chalice: The Entrance Hall"))
+    self.set_rule(self.get_entrance("The Time Device -> Hall of Heroes"),cleared("The Time Device") & CanReachLocation("Chalice: The Time Device"))
+    if self.options.include_ant_hill_in_checks.value == IncludeAntHillInChecksToggle.option_true:
+        self.set_rule(self.get_entrance("Ant Hill -> Hall of Heroes"),cleared("Ant Hill") & CanReachLocation("Chalice: Ant Hill"))
+
 
 

@@ -29,7 +29,9 @@ from .Rules import (
     set_weapon_dependencies,
     set_key_item_dependencies,
     set_locked_items_locations,
-    set_runesanity_rules
+    set_non_runesanity_rules,
+    set_runesanity_rules,
+    set_HoH_entrances
 )
 from .VictoryConditions import defeat_zarok_and_get_chalices_victory, defeat_zarok_victory, get_chalices_victory
 
@@ -91,9 +93,10 @@ class MedievilWorld(World):
     def validate_yaml_options(self) -> None:
         if self.options.goal.value != GoalOptions.DEFEAT_ZAROK \
             and self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_false:
-            raise OptionError(
-                "include_chalices_in_checks must be true for goal other than Defeat Zarok"
-            )
+            self.options.include_chalices_in_checks.value = IncludeChalicesInChecksToggle.option_true
+            # raise OptionError(
+            #     "include_chalices_in_checks must be true for goal other than Defeat Zarok"
+            # )
 
     def create_regions(self):
         # Create Regions
@@ -194,11 +197,37 @@ class MedievilWorld(World):
         create_connection("The Time Device", "Map")
         create_connection("Zaroks Lair", "Map")
 
+       # Can go to Hall of heroes from each level with chalice
+        if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_true:
+            create_connection("The Graveyard", "Hall of Heroes")
+            create_connection("Return to the Graveyard", "Hall of Heroes")
+            create_connection("Cemetery Hill", "Hall of Heroes")
+            create_connection("The Hilltop Mausoleum", "Hall of Heroes")
+            create_connection("Scarecrow Fields", "Hall of Heroes")
+            create_connection("Enchanted Earth", "Hall of Heroes")
+            create_connection("The Crystal Caves", "Hall of Heroes")
+            create_connection("The Lake", "Hall of Heroes")
+            create_connection("Pumpkin Gorge", "Hall of Heroes")
+            create_connection("Pumpkin Serpent", "Hall of Heroes")
+            create_connection("The Sleeping Village", "Hall of Heroes")
+            create_connection("Pools of the Ancient Dead", "Hall of Heroes")
+            create_connection("Asylum Grounds", "Hall of Heroes")
+            create_connection("Inside the Asylum", "Hall of Heroes")
+            create_connection("The Gallows Gauntlet", "Hall of Heroes")
+            create_connection("The Haunted Ruins", "Hall of Heroes")
+            create_connection("The Ghost Ship", "Hall of Heroes")
+            create_connection("The Entrance Hall", "Hall of Heroes")
+            create_connection("The Time Device", "Hall of Heroes")
+            create_connection("Hall of Heroes", "Map")
+
         if self.options.include_ant_hill_in_checks.value == IncludeAntHillInChecksToggle.option_true:
             create_connection("Enchanted Earth", "Ant Hill")
+            if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_true:
+                create_connection("Ant Hill", "Hall of Heroes")
 
         # # hall of heroes
-        create_connection("Map", "Hall of Heroes")
+
+        # Locked areas
         create_connection("Dan's Crypt", "Dan's Crypt Locked Items")
         create_connection("Cemetery Hill", "Cemetery Hill Locked Items")
         create_connection("The Hilltop Mausoleum", "Hilltop Mausoleum Locked Items")
@@ -206,7 +235,14 @@ class MedievilWorld(World):
         create_connection("Scarecrow Fields", "Scarecrow Fields Locked Items")
         create_connection("The Sleeping Village", "Sleeping Village Locked Items")
         create_connection("Enchanted Earth", "Enchanted Earth Locked Items")
-        # create_connection("Hall of Heroes", "Map")
+        # Dont think these even matter?
+        create_connection("Dan's Crypt Locked Items","Dan's Crypt")
+        create_connection("Cemetery Hill Locked Items","Cemetery Hill")
+        create_connection("Hilltop Mausoleum Locked Items","The Hilltop Mausoleum")
+        create_connection("Return to the Graveyard Locked Items","Return to the Graveyard")
+        create_connection("Scarecrow Fields Locked Items","Scarecrow Fields")
+        create_connection("Sleeping Village Locked Items","The Sleeping Village")
+        create_connection("Enchanted Earth Locked Items","Enchanted Earth")
 
     # For each region, add the associated locations retrieved from the corresponding location_table
     def create_region(self, region_name, location_table) -> Region:
@@ -354,7 +390,10 @@ class MedievilWorld(World):
 
         for location in self.multiworld.get_locations(self.player):
             # Check if the location is within "Dan's Crypt" or "Locked Items DC"
-            # Should be able to get rid of this if client can stop giving any of them on new game
+
+            
+            '''This is causing very few(0.35-0.5% fuzzer) fill errors with all(2-3) medievil games(did not test with other games)'''
+            '''Should be able to get rid of this if client can stop giving any of them on new game'''
             if location.parent_region.name in ["Dan's Crypt", "Dan's Crypt Locked Items"]:
                 add_item_rule(location, lambda item: item.name != "Equipment: Hammer")
                 add_item_rule(location, lambda item: item.name != "Equipment: Club")
@@ -384,13 +423,14 @@ class MedievilWorld(World):
         # hall of heroes
         if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_true:
             set_hall_of_heroes_progression(self, max_chalice_count)
-
+            set_HoH_entrances(self)
         # runesanity options
 
         if self.options.runesanity.value == RuneSanityToggle.option_true:
             # runesanity is the same for vanilla or open
             set_runesanity_rules(self)
-
+        else:
+            set_non_runesanity_rules(self)
        
 
         # key item dependencies that apply in every mode
