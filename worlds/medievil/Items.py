@@ -212,7 +212,7 @@ _all_items: List[MedievilItemData] = [
     ("Health Vial (150)", 29, MedievilItemCategory.AMMO_FILLER, False),
     ("Health Vial (300)", 30, MedievilItemCategory.AMMO_FILLER, False),
     # list of weapons
-    '''Maybe make some useful or proguseful rather than progression?'''
+    # Maybe make some useful or proguseful rather than progression?
     ("Equipment: Small Sword", 31, MedievilItemCategory.WEAPON, True),
     ("Equipment: Broadsword", 32, MedievilItemCategory.WEAPON, True),
     ("Equipment: Magic Sword", 33, MedievilItemCategory.WEAPON, True),
