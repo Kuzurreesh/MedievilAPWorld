@@ -93,10 +93,11 @@ class MedievilWorld(World):
     def validate_yaml_options(self) -> None:
         if self.options.goal.value != GoalOptions.DEFEAT_ZAROK \
             and self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_false:
-            self.options.include_chalices_in_checks.value = IncludeChalicesInChecksToggle.option_true
-            # raise OptionError(
-            #     "include_chalices_in_checks must be true for goal other than Defeat Zarok"
-            # )
+            '''We change it to include chalice or show an error needing it to be on?'''
+           # self.options.include_chalices_in_checks.value = IncludeChalicesInChecksToggle.option_true
+            raise OptionError(
+                "include_chalices_in_checks must be true for goal other than Defeat Zarok"
+            )
 
     def create_regions(self):
         # Create Regions
