@@ -138,7 +138,11 @@ def set_vanilla_level_progression(self: "MedievilWorld") -> None:
     self.set_rule(self.get_entrance("Map -> The Lake"), cleared("Pools of the Ancient Dead"))
     self.set_rule(self.get_entrance("Map -> The Crystal Caves"), cleared("The Lake"))
     self.set_rule(self.get_entrance("Map -> The Gallows Gauntlet"), cleared("The Crystal Caves"))
-    self.set_rule(self.get_entrance("Map -> The Haunted Ruins"), cleared("The Gallows Gauntlet"))
+    if self.options.runesanity.value == RuneSanityToggle.option_true:
+        self.set_rule(self.get_entrance("Map -> The Haunted Ruins"), cleared("The Gallows Gauntlet") & Has("Star Rune: The Gallows Gauntlet"))
+    else:
+        self.set_rule(self.get_entrance("Map -> The Haunted Ruins"), cleared("The Gallows Gauntlet") & weapon("Dragon Armour"))
+    
     self.set_rule(self.get_entrance("Map -> The Ghost Ship"), cleared("The Haunted Ruins"))
     self.set_rule(self.get_entrance("Map -> The Entrance Hall"), cleared("Ghost Ship"))
     self.set_rule(self.get_entrance("Map -> The Time Device"), cleared("The Entrance Hall"))
@@ -311,7 +315,6 @@ def set_non_runesanity_rules(self: "MedievilWorld") -> None:
             "Gold Coins: Chest at Catapult 2 - HR",
             "Gold Coins: Chest at Catapult 3 - HR",
             "Book: Escape - HR",
-
         ]
         
     )
@@ -460,8 +463,6 @@ def set_runesanity_rules(self: "MedievilWorld") -> None:
             "Gold Coins: Bag in the Press - SF",
             "Gold Coins: Bag in the Spinner - SF",
             "Gold Coins: Chest next to Harvester Part - SF",
-            "Book: Scarecrows - SF",
-            "Book: Mischief Makers - SF",
             "Book: Kul Katura - SF",
             "Book: Cornfields - SF",
             "Book: Mad Machines - SF",
@@ -741,7 +742,8 @@ def set_runesanity_rules(self: "MedievilWorld") -> None:
             "Chalice: The Haunted Ruins",
 
         ], 
-        ["Chaos Rune: The Haunted Ruins"])
+        ["Chaos Rune: The Haunted Ruins"]
+        )
 
     set_rune_blocks(
         self,
@@ -752,7 +754,7 @@ def set_runesanity_rules(self: "MedievilWorld") -> None:
             "Book: Escape - HR",
             "Cleared: The Haunted Ruins",
         ],
-        ["Earth Rune: The Haunted Ruins"],
+        ["Earth Rune: The Haunted Ruins"]
     )
 
     # Ghost Ship
@@ -892,6 +894,7 @@ def set_weapon_dependencies(self: "MedievilWorld") -> None:
             "Energy Vial: Boulders After Time Rune - PG",
             "Gold Coins: Chest at Boulders after Time Rune - PG",
             "Chalice: Pumpkin Gorge",
+            "Chalice: The Haunted Ruins",
 
         ],
     )
@@ -948,7 +951,6 @@ def set_weapon_dependencies(self: "MedievilWorld") -> None:
             "Gold Coins: Chest at Merchant Gargoyle - PS",
             "Key Item: Dragon Gem - PS",
             "Chalice: Pumpkin Serpent",
-            "Chalice: The Entrance Hall",
             "Cleared: Pumpkin Serpent",
             "Cleared: Zaroks Lair"
 

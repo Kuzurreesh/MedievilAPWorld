@@ -427,12 +427,7 @@ class MedievilWorld(World):
             set_HoH_entrances(self)
         # runesanity options
 
-        if self.options.runesanity.value == RuneSanityToggle.option_true:
-            # runesanity is the same for vanilla or open
-            set_runesanity_rules(self)
-        else:
-            set_non_runesanity_rules(self)
-       
+      
 
         # key item dependencies that apply in every mode
         set_key_item_dependencies(self)
@@ -443,6 +438,12 @@ class MedievilWorld(World):
         # locations needing weapons to access
         set_weapon_dependencies(self)
 
+        if self.options.runesanity.value == RuneSanityToggle.option_true:
+            # runesanity is the same for vanilla or open
+            set_runesanity_rules(self)
+        else:
+            set_non_runesanity_rules(self)
+            
         
         # Get a birds eye view of everything
 
