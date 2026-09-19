@@ -75,9 +75,9 @@ class MedievilLocation(Location):
             "Zaroks Lair",
             "Dan's Crypt Locked Items",
             "Cemetery Hill Locked Items",
-            "Hilltop Mausoleum Locked Items",
+            "The Hilltop Mausoleum Locked Items",
             "Scarecrow Fields Locked Items",
-            "Sleeping Village Locked Items",
+            "The Sleeping Village Locked Items",
             "Return to the Graveyard Locked Items",
             "Enchanted Earth Locked Items"
         ]
@@ -606,7 +606,7 @@ location_tables = {
         MedievilLocationData("Chalice: Cemetery Hill", "Gold Shield Ammo (100)", MedievilLocationCategory.CHALICE_PICKUP),
         MedievilLocationData("Gold Coins: Chest in Arena - CH", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN)
     ],
-    "Hilltop Mausoleum Locked Items": [
+    "The Hilltop Mausoleum Locked Items": [
         MedievilLocationData("Gold Coins: Gold Chest at Phantom of the Opera 1 - HM", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Gold Coins: Gold Chest at Phantom of the Opera 2 - HM", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Gold Coins: Gold Chest at Phantom of the Opera 3 - HM", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
@@ -617,7 +617,7 @@ location_tables = {
         MedievilLocationData("Gold Coins: Chest Next to Chalice - SF", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Chalice: Scarecrow Fields", "Gold Shield Ammo (100)", MedievilLocationCategory.CHALICE_PICKUP),
     ],
-    "Sleeping Village Locked Items": [
+    "The Sleeping Village Locked Items": [
         # REQUIRES Crucifix
         MedievilLocationData("Energy Vial: Near Chalice - SV", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),
         MedievilLocationData("Gold Coins: Chest next to Chalice - SV", "Gold Shield Ammo (100)", MedievilLocationCategory.FUN),

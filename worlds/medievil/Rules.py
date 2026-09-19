@@ -752,10 +752,16 @@ def set_runesanity_rules(self: "MedievilWorld") -> None:
             "Gold Coins: Chest at Catapult 2 - HR",
             "Gold Coins: Chest at Catapult 3 - HR",
             "Book: Escape - HR",
-            "Cleared: The Haunted Ruins",
         ],
         ["Earth Rune: The Haunted Ruins"]
     )
+    set_rune_blocks(
+            self,
+            [
+                "Cleared: The Haunted Ruins",
+            ],
+            ["Earth Rune: The Haunted Ruins","Chaos Rune: The Haunted Ruins"]
+        )
 
     # Ghost Ship
 
@@ -986,7 +992,7 @@ def set_weapon_dependencies(self: "MedievilWorld") -> None:
 
 def set_key_item_dependencies(self: "MedievilWorld") -> None:
     """Base-game key-item dependencies, applied in every mode."""
-    self.set_rule(self.get_location("Key Item: Shadow Artefact - SV"), key_items("Safe Key"))
+    self.set_rule(self.get_location("Key Item: Shadow Artefact - SV"), key_items("Safe Key") & CanReachLocation("Key Item: Landlords Bust - SV"))
     self.set_rule(self.get_location("Key Item: Crucifix - SV"), key_items("Landlords Bust", "Crucifix Cast"))
     self.set_rule(self.get_location("Cleared: Pools of the Ancient Dead"), REQUIRED_SOULS)
     self.set_rule(self.get_location("Key Item: Dragon Gem - PS"), key_items("Witches Talisman"))
@@ -1012,10 +1018,10 @@ def set_locked_items_locations(self: "MedievilWorld") -> None:
     self.set_rule(self.get_entrance("Dan's Crypt -> Dan's Crypt Locked Items"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Dan's Crypt -> Map"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Cemetery Hill -> Cemetery Hill Locked Items"), weapon("Club"))
-    self.set_rule(self.get_entrance("The Hilltop Mausoleum -> Hilltop Mausoleum Locked Items"), key_items("Sheet Music"))
+    self.set_rule(self.get_entrance("The Hilltop Mausoleum -> The Hilltop Mausoleum Locked Items"), key_items("Sheet Music"))
     self.set_rule(self.get_entrance("Return to the Graveyard -> Return to the Graveyard Locked Items"), key_items("Skull Key"))
     self.set_rule(self.get_entrance("Scarecrow Fields -> Scarecrow Fields Locked Items"), key_items("Harvester Parts"))
-    self.set_rule(self.get_entrance("The Sleeping Village -> Sleeping Village Locked Items"), key_items("Crucifix"))
+    self.set_rule(self.get_entrance("The Sleeping Village -> The Sleeping Village Locked Items"), key_items("Crucifix"))
     self.set_rule(self.get_entrance("Enchanted Earth -> Enchanted Earth Locked Items"), key_items("Shadow Artefact","Shadow Talisman"))
 
 

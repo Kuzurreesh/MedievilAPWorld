@@ -131,9 +131,9 @@ class MedievilWorld(World):
             "Zaroks Lair",
             "Dan's Crypt Locked Items",
             "Cemetery Hill Locked Items",
-            "Hilltop Mausoleum Locked Items",
+            "The Hilltop Mausoleum Locked Items",
             "Scarecrow Fields Locked Items",
-            "Sleeping Village Locked Items",
+            "The Sleeping Village Locked Items",
             "Return to the Graveyard Locked Items",
             "Enchanted Earth Locked Items"
         ]
@@ -231,18 +231,18 @@ class MedievilWorld(World):
         # Locked areas
         create_connection("Dan's Crypt", "Dan's Crypt Locked Items")
         create_connection("Cemetery Hill", "Cemetery Hill Locked Items")
-        create_connection("The Hilltop Mausoleum", "Hilltop Mausoleum Locked Items")
+        create_connection("The Hilltop Mausoleum", "The Hilltop Mausoleum Locked Items")
         create_connection("Return to the Graveyard", "Return to the Graveyard Locked Items")
         create_connection("Scarecrow Fields", "Scarecrow Fields Locked Items")
-        create_connection("The Sleeping Village", "Sleeping Village Locked Items")
+        create_connection("The Sleeping Village", "The Sleeping Village Locked Items")
         create_connection("Enchanted Earth", "Enchanted Earth Locked Items")
         # Dont think these even matter?
         create_connection("Dan's Crypt Locked Items","Dan's Crypt")
         create_connection("Cemetery Hill Locked Items","Cemetery Hill")
-        create_connection("Hilltop Mausoleum Locked Items","The Hilltop Mausoleum")
+        create_connection("The Hilltop Mausoleum Locked Items","The Hilltop Mausoleum")
         create_connection("Return to the Graveyard Locked Items","Return to the Graveyard")
         create_connection("Scarecrow Fields Locked Items","Scarecrow Fields")
-        create_connection("Sleeping Village Locked Items","The Sleeping Village")
+        create_connection("The Sleeping Village Locked Items","The Sleeping Village")
         create_connection("Enchanted Earth Locked Items","Enchanted Earth")
 
     # For each region, add the associated locations retrieved from the corresponding location_table
