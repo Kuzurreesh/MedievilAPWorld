@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from typing_extensions import override
 
 from BaseClasses import CollectionState, Entrance, Location
-from rule_builder.rules import CanReachLocation, Has, HasAll, Rule, True_, HasAny, HasFromList, CanReachEntrance
+from rule_builder.rules import CanReachLocation, Has, HasAll, Rule, True_, HasAny, HasFromList, AtLeast, CanReachEntrance
 from .Options import IncludeAntHillInChecksToggle, IncludeChalicesInChecksToggle, BookSanityToggle, GargoyleSanityToggle, RuneSanityToggle
 from .Items import _weapons, _ranged_weapons, _life_bottles
 
@@ -25,6 +25,29 @@ def cleared(level: str) -> Rule:
 
 
 DARING_DASH = Has("Skill: Daring Dash")
+
+HoH_ACCESS = [
+    CanReachEntrance("The Graveyard -> Hall of Heroes"),
+    CanReachEntrance("Cemetery Hill -> Hall of Heroes"),
+    CanReachEntrance("The Hilltop Mausoleum -> Hall of Heroes"),
+    CanReachEntrance("Return to the Graveyard -> Hall of Heroes"),
+    CanReachEntrance("Scarecrow Fields -> Hall of Heroes"),
+    CanReachEntrance("Enchanted Earth -> Hall of Heroes"),
+    CanReachEntrance("The Sleeping Village -> Hall of Heroes"),
+    CanReachEntrance("Pools of the Ancient Dead -> Hall of Heroes"),
+    CanReachEntrance("The Lake -> Hall of Heroes"),
+    CanReachEntrance("The Crystal Caves -> Hall of Heroes"),
+    CanReachEntrance("The Gallows Gauntlet -> Hall of Heroes"),
+    CanReachEntrance("Asylum Grounds -> Hall of Heroes"),
+    CanReachEntrance("Inside the Asylum -> Hall of Heroes"),
+    CanReachEntrance("Pumpkin Gorge -> Hall of Heroes"),
+    CanReachEntrance("Pumpkin Serpent -> Hall of Heroes"),
+    CanReachEntrance("The Haunted Ruins -> Hall of Heroes"),
+    CanReachEntrance("The Ghost Ship -> Hall of Heroes"),
+    CanReachEntrance("The Entrance Hall -> Hall of Heroes"),
+    CanReachEntrance("The Time Device -> Hall of Heroes"),
+
+]
 
 REQUIRED_SOULS = HasAll(*[f"Key Item: Soul Helmet {i}" for i in range(1, 9)])
 
@@ -222,7 +245,7 @@ def set_hall_of_heroes_progression(self: "MedievilWorld", max_chalice_count: int
     # With AtLeast from AP 0.6.8 and list of CanReachEntrance("Hall of Heroes", parent_region_name="Level") (set up in set_HoH_entrances) we can set these properly to check chalice + cleared
     for i in range(1, max_chalice_count + 1):
         location_name = f"Chalice Reward {i}"
-        self.set_rule(self.get_location(location_name), HasNumberOfChalices(i))
+        self.set_rule(self.get_location(location_name), AtLeast(i, *[rule for rule in HoH_ACCESS]))
 
 
 def set_rune_blocks(self: "MedievilWorld", locations: list[str], runes: list[str]) -> None:
@@ -1003,9 +1026,7 @@ def set_key_item_dependencies(self: "MedievilWorld") -> None:
         self.set_rule(self.get_location("Chalice: Sleeping Village"), CanReachLocation("Key Item: Landlords Bust - SV"))
         set_weapon_locations(self,['Chalice: The Entrance Hall'],_weapons)
         if self.options.runesanity.value == RuneSanityToggle.option_true:
-            self.set_rule(self.get_location("Chalice: Ghost Ship"), Has("Moon Rune: Ghost Ship") | weapon("Club")) 
-        else:
-            self.set_rule(self.get_location("Chalice: Ghost Ship"), weapon("Club")) 
+            self.set_rule(self.get_location("Chalice: Ghost Ship"), Has("Moon Rune: Ghost Ship") | weapon("Club"))
     self.set_rule(self.get_location("Cleared: Ghost Ship"), weapon("Club")) 
     self.set_rule(self.get_location("Cleared: Zaroks Lair"), weapon("Good Lightning") & HasFromList(*_life_bottles, count=5))
     self.set_rule(self.get_location("Cleared: Sleeping Village"), CanReachLocation("Key Item: Landlords Bust - SV"))
