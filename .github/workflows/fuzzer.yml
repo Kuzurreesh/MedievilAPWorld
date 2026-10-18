@@ -12,6 +12,7 @@ jobs:
       - uses: Eijebong/ap-actions/fuzz@main
         with:
           apworld-path: worlds/medievil
-          ap-version: '0.6.7'
-          python-version: '3.12'
+          ap-version: "0.6.8"
+          python-version: "3.12"
           runs: 100
+          fuzzer-commit: 53686ba34f9e8852cbe1970666a5f56fd6abf75a

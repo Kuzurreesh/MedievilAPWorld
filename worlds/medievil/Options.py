@@ -38,8 +38,9 @@ class GuaranteedItemsOption(ItemDict):
 class GoalOption(Choice):
     """Lets the user choose the completion goal
     Defeat Zarok - Beat the boss at the end
-    Chalices - Collect all chalices
+    Chalice - Collect chalices
     Both - Defeat both zarok AND get the chalices
+    Must have include_chalices_in_checks set to true for Chalice or Both goal.
     """
 
     display_name = "Completion Goal"

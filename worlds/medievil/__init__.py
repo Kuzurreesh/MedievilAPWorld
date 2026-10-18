@@ -2,7 +2,7 @@
 from typing import Dict, Set, List
 
 from BaseClasses import MultiWorld, Region, Item, Entrance, Tutorial, ItemClassification, CollectionState
-from Options import Toggle
+from Options import Toggle, OptionError
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import add_item_rule
@@ -22,13 +22,16 @@ from .Options import (
 from .Rules import (
     set_ant_hill_rules_open,
     set_ant_hill_rules_vanilla,
+    set_ant_hill_bash_rules,
     set_vanilla_level_progression,
     set_open_level_progression,
     set_hall_of_heroes_progression,
+    set_weapon_dependencies,
     set_key_item_dependencies,
     set_locked_items_locations,
-    set_open_runesanity_rules,
-    set_vanilla_runesanity_rules,
+    set_non_runesanity_rules,
+    set_runesanity_rules,
+    set_HoH_entrances,
 )
 from .VictoryConditions import defeat_zarok_and_get_chalices_victory, defeat_zarok_victory, get_chalices_victory
 
@@ -76,6 +79,7 @@ class MedievilWorld(World):
         self.enabled_location_categories = set()
 
     def generate_early(self):
+        self.validate_yaml_options()
         self.enabled_location_categories.add(MedievilLocationCategory.PROGRESSION)
         self.enabled_location_categories.add(MedievilLocationCategory.WEAPON)
         self.enabled_location_categories.add(MedievilLocationCategory.CHALICE_PICKUP)
@@ -85,6 +89,15 @@ class MedievilWorld(World):
         self.enabled_location_categories.add(MedievilLocationCategory.FUN)
         self.enabled_location_categories.add(MedievilLocationCategory.LEVEL_END)
         self.enabled_location_categories.add(MedievilLocationCategory.DYNAMIC_ITEM)
+
+    def validate_yaml_options(self) -> None:
+        if self.options.goal.value != GoalOptions.DEFEAT_ZAROK \
+            and self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_false:
+            '''We change it to include chalice or show an error needing it to be on?'''
+           # self.options.include_chalices_in_checks.value = IncludeChalicesInChecksToggle.option_true
+            raise OptionError(
+                "include_chalices_in_checks must be true for goal other than Defeat Zarok"
+            )
 
     def create_regions(self):
         # Create Regions
@@ -116,18 +129,19 @@ class MedievilWorld(World):
             "The Entrance Hall",
             "The Time Device",
             "Zaroks Lair",
-            "Locked Items DC",
-            "Locked Items CH",
-            "Locked Items HM",
-            "Locked Items SF",
-            "Locked Items SV",
+            "Dan's Crypt Locked Items",
+            "Cemetery Hill Locked Items",
+            "The Hilltop Mausoleum Locked Items",
+            "Scarecrow Fields Locked Items",
+            "The Sleeping Village Locked Items",
+            "Return to the Graveyard Locked Items",
+            "Enchanted Earth Locked Items"
         ]
 
         if self.options.include_ant_hill_in_checks.value == IncludeAntHillInChecksToggle.option_true:
             list_of_regions.insert(8, "Ant Hill")
         # else:
         #     location_tables.pop("Ant Hill")
-
         regions.update({region_name: self.create_region(region_name, location_tables[region_name]) for region_name in list_of_regions})
 
         def create_connection(from_region: str, to_region: str):
@@ -181,19 +195,54 @@ class MedievilWorld(World):
         create_connection("The Ghost Ship", "Map")
         create_connection("The Entrance Hall", "Map")
         create_connection("The Time Device", "Map")
+        create_connection("Zaroks Lair", "Map")
+
+       # Can go to Hall of heroes from each level with chalice
+        if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_true:
+            create_connection("The Graveyard", "Hall of Heroes")
+            create_connection("Return to the Graveyard", "Hall of Heroes")
+            create_connection("Cemetery Hill", "Hall of Heroes")
+            create_connection("The Hilltop Mausoleum", "Hall of Heroes")
+            create_connection("Scarecrow Fields", "Hall of Heroes")
+            create_connection("Enchanted Earth", "Hall of Heroes")
+            create_connection("The Crystal Caves", "Hall of Heroes")
+            create_connection("The Lake", "Hall of Heroes")
+            create_connection("Pumpkin Gorge", "Hall of Heroes")
+            create_connection("Pumpkin Serpent", "Hall of Heroes")
+            create_connection("The Sleeping Village", "Hall of Heroes")
+            create_connection("Pools of the Ancient Dead", "Hall of Heroes")
+            create_connection("Asylum Grounds", "Hall of Heroes")
+            create_connection("Inside the Asylum", "Hall of Heroes")
+            create_connection("The Gallows Gauntlet", "Hall of Heroes")
+            create_connection("The Haunted Ruins", "Hall of Heroes")
+            create_connection("The Ghost Ship", "Hall of Heroes")
+            create_connection("The Entrance Hall", "Hall of Heroes")
+            create_connection("The Time Device", "Hall of Heroes")
+            create_connection("Hall of Heroes", "Map")
 
         if self.options.include_ant_hill_in_checks.value == IncludeAntHillInChecksToggle.option_true:
             create_connection("Enchanted Earth", "Ant Hill")
+            if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_true:
+                create_connection("Ant Hill", "Hall of Heroes")
 
         # # hall of heroes
-        create_connection("Map", "Hall of Heroes")
 
-        create_connection("Dan's Crypt", "Locked Items DC")
-        create_connection("Cemetery Hill", "Locked Items CH")
-        create_connection("The Hilltop Mausoleum", "Locked Items HM")
-        create_connection("Scarecrow Fields", "Locked Items SF")
-        create_connection("The Sleeping Village", "Locked Items SV")
-        create_connection("Hall of Heroes", "Map")
+        # Locked areas
+        create_connection("Dan's Crypt", "Dan's Crypt Locked Items")
+        create_connection("Cemetery Hill", "Cemetery Hill Locked Items")
+        create_connection("The Hilltop Mausoleum", "The Hilltop Mausoleum Locked Items")
+        create_connection("Return to the Graveyard", "Return to the Graveyard Locked Items")
+        create_connection("Scarecrow Fields", "Scarecrow Fields Locked Items")
+        create_connection("The Sleeping Village", "The Sleeping Village Locked Items")
+        create_connection("Enchanted Earth", "Enchanted Earth Locked Items")
+        # Dont think these even matter?
+        create_connection("Dan's Crypt Locked Items","Dan's Crypt")
+        create_connection("Cemetery Hill Locked Items","Cemetery Hill")
+        create_connection("The Hilltop Mausoleum Locked Items","The Hilltop Mausoleum")
+        create_connection("Return to the Graveyard Locked Items","Return to the Graveyard")
+        create_connection("Scarecrow Fields Locked Items","Scarecrow Fields")
+        create_connection("The Sleeping Village Locked Items","The Sleeping Village")
+        create_connection("Enchanted Earth Locked Items","Enchanted Earth")
 
     # For each region, add the associated locations retrieved from the corresponding location_table
     def create_region(self, region_name, location_table) -> Region:
@@ -232,7 +281,7 @@ class MedievilWorld(World):
                 continue
 
             if location.name == "Equipment: Good Lightning - ZL":
-                good_lightning = MedievilItem("Equipment: Good Lightning", ItemClassification.useful, 9901045, self.player)
+                good_lightning = MedievilItem("Equipment: Good Lightning", ItemClassification.progression, 9901045, self.player)
                 new_location = MedievilLocation(
                     self.player,
                     "Equipment: Good Lightning - ZL",
@@ -243,17 +292,17 @@ class MedievilWorld(World):
                 )
                 new_location.place_locked_item(good_lightning)
 
-            elif self.options.runesanity.value == RuneSanityToggle.option_true and location.name == "Star Rune: Dan's Crypt":
-                first_star_rune = MedievilItem("Star Rune: Dan's Crypt", ItemClassification.progression, 9901146, self.player)
-                new_location = MedievilLocation(
-                    self.player,
-                    "Star Rune: Dan's Crypt",
-                    MedievilLocationCategory.RUNE,
-                    "Star Rune: Dan's Crypt",
-                    self.location_name_to_id["Star Rune: Dan's Crypt"],
-                    new_region,
-                )
-                new_location.place_locked_item(first_star_rune)
+            # elif self.options.runesanity.value == RuneSanityToggle.option_true and location.name == "Star Rune: Dan's Crypt":
+            #     first_star_rune = MedievilItem("Star Rune: Dan's Crypt", ItemClassification.progression, 9901146, self.player)
+            #     new_location = MedievilLocation(
+            #         self.player,
+            #         "Star Rune: Dan's Crypt",
+            #         MedievilLocationCategory.RUNE,
+            #         "Star Rune: Dan's Crypt",
+            #         self.location_name_to_id["Star Rune: Dan's Crypt"],
+            #         new_region,
+            #     )
+            #     new_location.place_locked_item(first_star_rune)
 
             elif location.category in self.enabled_location_categories:
                 new_location = MedievilLocation(
@@ -341,13 +390,18 @@ class MedievilWorld(World):
 
         for location in self.multiworld.get_locations(self.player):
             # Check if the location is within "Dan's Crypt" or "Locked Items DC"
-            if location.parent_region.name in ["Dan's Crypt", "Locked Items DC"]:
+
+            
+            '''This is causing very few(0.35-0.5% fuzzer) fill errors with all(2-3) medievil games(did not test with other games)'''
+            '''Should be able to get rid of this if client can stop giving any of them on new game'''
+            if location.parent_region.name in ["Dan's Crypt", "Dan's Crypt Locked Items"]:
                 add_item_rule(location, lambda item: item.name != "Equipment: Hammer")
                 add_item_rule(location, lambda item: item.name != "Equipment: Club")
                 add_item_rule(location, lambda item: item.name != "Skill: Daring Dash")
 
-            if location.parent_region.name in ["Locked Items DC", "Locked Items CH", "Locked Items HM", "Locked Items SF"]:
-                add_item_rule(location, lambda item: item.name != "Key Item: Skull Key")
+            # This should not matter with correct logic
+            # if location.parent_region.name in ["Dan's Crypt Locked Items", "Cemetery Hill Locked Items", "Hilltop Mausoleum Locked Items", "Scarecrow Fields Locked Items"]:
+            #     add_item_rule(location, lambda item: item.name != "Key Item: Skull Key")
 
             if "Chalice Reward" in location.name:
                 add_item_rule(location, lambda item: "Key Item" not in item.name)
@@ -358,6 +412,7 @@ class MedievilWorld(World):
                 set_ant_hill_rules_open(self)
             else:
                 set_ant_hill_rules_vanilla(self)
+            set_ant_hill_bash_rules(self)
 
         # level progression
         if self.options.progression_option.value == ProgressionOptions.VANILLA:
@@ -367,15 +422,12 @@ class MedievilWorld(World):
 
         # hall of heroes
         if self.options.include_chalices_in_checks.value == IncludeChalicesInChecksToggle.option_true:
+            set_HoH_entrances(self)
             set_hall_of_heroes_progression(self, max_chalice_count)
-
+            
         # runesanity options
 
-        if self.options.runesanity.value == RuneSanityToggle.option_true:
-            if self.options.progression_option.value == ProgressionOptions.VANILLA:
-                set_vanilla_runesanity_rules(self)
-            elif self.options.progression_option.value == ProgressionOptions.OPEN:
-                set_open_runesanity_rules(self)
+      
 
         # key item dependencies that apply in every mode
         set_key_item_dependencies(self)
@@ -383,6 +435,16 @@ class MedievilWorld(World):
         # locked chalice items
         set_locked_items_locations(self)
 
+        # locations needing weapons to access
+        set_weapon_dependencies(self)
+
+        if self.options.runesanity.value == RuneSanityToggle.option_true:
+            # runesanity is the same for vanilla or open
+            set_runesanity_rules(self)
+        else:
+            set_non_runesanity_rules(self)
+            
+        
         # Get a birds eye view of everything
 
         # from Utils import visualize_regions

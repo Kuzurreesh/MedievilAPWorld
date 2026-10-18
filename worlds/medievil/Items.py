@@ -61,7 +61,7 @@ key_item_names = {
     "Life Bottle: Dan's Crypt - Behind Wall",
     "Life Bottle: Scarecrow Fields",
     "Life Bottle: Pools of the Ancient Dead",
-    "Life Bottle: Hall of Heroes (Ravenhooves The Archer )",
+    "Life Bottle: Hall of Heroes (Ravenhooves The Archer)",
     "Life Bottle: Hall of Heroes (Dirk Steadfast)",
     "Life Bottle: The Time Device",
     # skills
@@ -138,6 +138,45 @@ key_item_names = {
     "Time Rune: The Time Device",
 }
 
+_weapons = [
+    "Equipment: Small Sword",
+    "Equipment: Broadsword",
+    "Equipment: Magic Sword",
+    "Equipment: Club",
+    "Equipment: Hammer",
+    "Equipment: Daggers",
+    "Equipment: Axe",
+    "Equipment: Crossbow",
+    "Equipment: Longbow",
+    "Equipment: Fire Longbow", 
+    "Equipment: Magic Longbow", 
+    "Equipment: Spear",
+    "Equipment: Lightning"
+]
+_ranged_weapons = [
+    "Equipment: Daggers",
+    "Equipment: Axe",
+    "Equipment: Crossbow",
+    "Equipment: Longbow",
+    "Equipment: Fire Longbow", 
+    "Equipment: Magic Longbow", 
+    "Equipment: Spear",
+    "Equipment: Lightning"
+]
+
+_life_bottles= {
+    # life bottles
+    "Life Bottle: Dan's Crypt",
+    "Life Bottle: The Graveyard",
+    "Life Bottle: Hall of Heroes (Canny Tim)",
+    "Life Bottle: Dan's Crypt - Behind Wall",
+    "Life Bottle: Scarecrow Fields",
+    "Life Bottle: Pools of the Ancient Dead",
+    "Life Bottle: Hall of Heroes (Ravenhooves The Archer)",
+    "Life Bottle: Hall of Heroes (Dirk Steadfast)",
+    "Life Bottle: The Time Device"
+}
+
 
 _all_items: List[MedievilItemData] = [
     # Filler Items
@@ -173,21 +212,22 @@ _all_items: List[MedievilItemData] = [
     ("Health Vial (150)", 29, MedievilItemCategory.AMMO_FILLER, False),
     ("Health Vial (300)", 30, MedievilItemCategory.AMMO_FILLER, False),
     # list of weapons
-    ("Equipment: Small Sword", 31, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Broadsword", 32, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Magic Sword", 33, MedievilItemCategory.WEAPON, False),
+    # Maybe make some useful or proguseful rather than progression?
+    ("Equipment: Small Sword", 31, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Broadsword", 32, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Magic Sword", 33, MedievilItemCategory.WEAPON, True),
     ("Equipment: Club", 34, MedievilItemCategory.PROGRESSION, True),
     ("Equipment: Hammer", 35, MedievilItemCategory.WEAPON, True),
-    ("Equipment: Daggers", 36, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Axe", 37, MedievilItemCategory.WEAPON, False),
+    ("Equipment: Daggers", 36, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Axe", 37, MedievilItemCategory.WEAPON, True),
     ("Equipment: Chicken Drumsticks", 38, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Crossbow", 39, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Longbow", 40, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Fire Longbow", 41, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Magic Longbow", 42, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Spear", 43, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Lightning", 44, MedievilItemCategory.WEAPON, False),
-    ("Equipment: Good Lightning", 45, MedievilItemCategory.WEAPON, False),
+    ("Equipment: Crossbow", 39, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Longbow", 40, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Fire Longbow", 41, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Magic Longbow", 42, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Spear", 43, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Lightning", 44, MedievilItemCategory.WEAPON, True),
+    ("Equipment: Good Lightning", 45, MedievilItemCategory.WEAPON, True),
     ("Equipment: Copper Shield", 46, MedievilItemCategory.WEAPON, False),
     ("Equipment: Silver Shield", 47, MedievilItemCategory.WEAPON, False),
     ("Equipment: Gold Shield", 48, MedievilItemCategory.WEAPON, False),

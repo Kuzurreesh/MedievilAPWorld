@@ -15,10 +15,19 @@ ASYLUM_AND_POOLS_ITEMS = [
     "Key Item: Shadow Artefact",
 ] + [f"Key Item: Soul Helmet {i}" for i in range(1, 9)]
 
+FIVE_LIFE_BOTTLES = [
+    "Life Bottle: Dan's Crypt",
+    "Life Bottle: The Graveyard",
+    "Life Bottle: Scarecrow Fields",
+    "Life Bottle: Pools of the Ancient Dead",
+    "Life Bottle: The Time Device",
+]
+
 ALL_NON_ANT_HILL_CHALICE_UNLOCK_ITEMS = (
     [
         "Key Item: Witches Talisman",
         "Equipment: Club",
+        "Equipment: Daggers",
         "Key Item: Sheet Music",
         "Key Item: Skull Key",
         "Key Item: Harvester Parts",
@@ -31,15 +40,27 @@ ALL_NON_ANT_HILL_CHALICE_UNLOCK_ITEMS = (
 
 
 class DefeatZarokGoalTest(MedievilTestBase):
-    """Default goal. In open mode "Map -> Zaroks Lair" has no rule, so it's free."""
+    """
+    Default goal. Zaroks Lair itself is reachable for free in open mode, but "Cleared: Zaroks
+    Lair" needs any weapon, the Good Lightning (locked at Zaroks Lair) and 5 life bottles.
+    """
 
     options = {
         "goal": GoalOptions.DEFEAT_ZAROK,
         "progression_option": ProgressionOptions.OPEN,
     }
 
-    def test_beatable_as_soon_as_zaroks_lair_is_reachable(self) -> None:
+    def test_requires_a_weapon_and_five_life_bottles(self) -> None:
+        self.assertBeatable(False)
+        self.collect_by_name(FIVE_LIFE_BOTTLES)
+        self.assertBeatable(False)
+        self.collect_by_name("Equipment: Club")
         self.assertBeatable(True)
+
+    def test_four_life_bottles_are_not_enough(self) -> None:
+        self.collect_by_name("Equipment: Club")
+        self.collect_by_name(FIVE_LIFE_BOTTLES[:4])
+        self.assertBeatable(False)
 
 
 class ChaliceGoalTest(MedievilTestBase):
@@ -50,17 +71,16 @@ class ChaliceGoalTest(MedievilTestBase):
     }
 
     def test_not_beatable_until_required_chalice_count_reached(self) -> None:
-        # 9 chalices are freely reachable in open mode (see test_hall_of_heroes.py),
-        # which is below the configured requirement of 11.
+        # 7 chalice pickups are reachable with no items in open mode, below the requirement of 11.
         self.assertBeatable(False)
-        # Witches Talisman simultaneously unlocks Pumpkin Serpent's and Ant Hill's
-        # chalices, bringing the reachable count to 11.
-        self.collect_by_name("Key Item: Witches Talisman")
+        # A club opens Cemetery Hill, Pumpkin Gorge, Pumpkin Serpent, Inside the Asylum,
+        # Ghost Ship and The Entrance Hall's chalices, bringing the reachable count to 12.
+        self.collect_by_name("Equipment: Club")
         self.assertBeatable(True)
 
 
 class BothGoalTest(MedievilTestBase):
-    """Zaroks Lair is free in open mode, so this isolates the chalice-count half."""
+    """Isolates each half: the chalice count (needs a club) and Zarok (needs life bottles)."""
 
     options = {
         "goal": GoalOptions.BOTH,
@@ -70,7 +90,9 @@ class BothGoalTest(MedievilTestBase):
 
     def test_requires_both_zarok_and_chalice_count(self) -> None:
         self.assertBeatable(False)
-        self.collect_by_name("Key Item: Witches Talisman")
+        self.collect_by_name("Equipment: Club")
+        self.assertBeatable(False)  # chalices done, Zarok not
+        self.collect_by_name(FIVE_LIFE_BOTTLES)
         self.assertBeatable(True)
 
 
