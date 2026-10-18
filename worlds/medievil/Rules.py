@@ -243,9 +243,12 @@ def set_hall_of_heroes_progression(self: "MedievilWorld", max_chalice_count: int
     # hall of heroes rules
     #self.set_rule(self.get_entrance("Map -> Hall of Heroes"), HasNumberOfChalices(1))
     # With AtLeast from AP 0.6.8 and list of CanReachEntrance("Hall of Heroes", parent_region_name="Level") (set up in set_HoH_entrances) we can set these properly to check chalice + cleared
+    hoh_access = list(HoH_ACCESS)
+    if self.options.include_ant_hill_in_checks.value == IncludeAntHillInChecksToggle.option_true:
+        hoh_access.append(CanReachEntrance("Ant Hill -> Hall of Heroes"))
     for i in range(1, max_chalice_count + 1):
         location_name = f"Chalice Reward {i}"
-        self.set_rule(self.get_location(location_name), AtLeast(i, *[rule for rule in HoH_ACCESS]))
+        self.set_rule(self.get_location(location_name), AtLeast(i, *hoh_access))
 
 
 def set_rune_blocks(self: "MedievilWorld", locations: list[str], runes: list[str]) -> None:
@@ -1038,7 +1041,7 @@ def set_key_item_dependencies(self: "MedievilWorld") -> None:
 def set_locked_items_locations(self: "MedievilWorld") -> None:
     self.set_rule(self.get_entrance("Dan's Crypt -> Dan's Crypt Locked Items"), cleared("Dan's Crypt"))
     self.set_rule(self.get_entrance("Dan's Crypt -> Map"), cleared("Dan's Crypt"))
-    self.set_rule(self.get_entrance("Cemetery Hill -> Cemetery Hill Locked Items"), weapon("Club"))
+    self.set_rule(self.get_entrance("Cemetery Hill -> Cemetery Hill Locked Items"), weapon("Club") | weapon("Hammer"))
     self.set_rule(self.get_entrance("The Hilltop Mausoleum -> The Hilltop Mausoleum Locked Items"), key_items("Sheet Music"))
     self.set_rule(self.get_entrance("Return to the Graveyard -> Return to the Graveyard Locked Items"), key_items("Skull Key"))
     self.set_rule(self.get_entrance("Scarecrow Fields -> Scarecrow Fields Locked Items"), key_items("Harvester Parts"))

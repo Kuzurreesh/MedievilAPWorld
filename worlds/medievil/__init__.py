@@ -6,8 +6,6 @@ from Options import Toggle, OptionError
 
 from worlds.AutoWorld import World, WebWorld
 from worlds.generic.Rules import add_item_rule
-from rule_builder.rules import CanReachEntrance
-
 
 from .Items import MedievilItem, MedievilItemCategory, item_dictionary, key_item_names, item_descriptions, BuildItemPool
 from .Locations import MedievilLocation, MedievilLocationCategory, MedievilLocationData, location_tables, location_dictionary
@@ -34,7 +32,6 @@ from .Rules import (
     set_non_runesanity_rules,
     set_runesanity_rules,
     set_HoH_entrances,
-    HoH_ACCESS
 )
 from .VictoryConditions import defeat_zarok_and_get_chalices_victory, defeat_zarok_victory, get_chalices_victory
 
@@ -143,7 +140,6 @@ class MedievilWorld(World):
 
         if self.options.include_ant_hill_in_checks.value == IncludeAntHillInChecksToggle.option_true:
             list_of_regions.insert(8, "Ant Hill")
-            HoH_ACCESS.append(CanReachEntrance("Ant Hill -> Hall of Heroes"))
         # else:
         #     location_tables.pop("Ant Hill")
         regions.update({region_name: self.create_region(region_name, location_tables[region_name]) for region_name in list_of_regions})
@@ -285,7 +281,7 @@ class MedievilWorld(World):
                 continue
 
             if location.name == "Equipment: Good Lightning - ZL":
-                good_lightning = MedievilItem("Equipment: Good Lightning", ItemClassification.useful, 9901045, self.player)
+                good_lightning = MedievilItem("Equipment: Good Lightning", ItemClassification.progression, 9901045, self.player)
                 new_location = MedievilLocation(
                     self.player,
                     "Equipment: Good Lightning - ZL",

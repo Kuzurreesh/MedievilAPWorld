@@ -14,10 +14,11 @@ class AntHillVanillaTest(MedievilTestBase):
     }
 
     def test_requires_return_to_graveyard_cleared_and_witches_talisman(self) -> None:
-        # Reaching Enchanted Earth (and thus this entrance) in vanilla requires the same
-        # chain as Return to the Graveyard: a club/hammer and the skull key.
+        # Return to the Graveyard must be cleared: that needs a club/hammer and a ranged weapon
+        # (Hilltop Mausoleum cleared) plus the skull key (Cleared: Return to the Graveyard sits
+        # in its Locked Items region).
         self.assertFalse(self.can_reach_region("Ant Hill"))
-        self.collect_by_name(["Equipment: Club", "Key Item: Skull Key"])
+        self.collect_by_name(["Equipment: Club", "Equipment: Daggers", "Key Item: Skull Key"])
         self.assertFalse(self.can_reach_region("Ant Hill"))
         self.collect_by_name("Key Item: Witches Talisman")
         self.assertTrue(self.can_reach_region("Ant Hill"))

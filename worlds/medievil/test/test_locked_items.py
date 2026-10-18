@@ -2,9 +2,8 @@
 Regression tests for set_locked_items_locations in Rules.py, which is called
 unconditionally in set_rules() regardless of progression_option.
 
-Uses open progression so the "Locked Items X" parent regions (Hilltop Mausoleum,
-Scarecrow Fields, Sleeping Village) are reachable without needing to also simulate
-the vanilla level-clear chain; Cemetery Hill is gated by a club/hammer in both modes.
+Uses open progression so the parent level regions are reachable without needing to also
+simulate the vanilla level-clear chain.
 """
 
 
@@ -17,41 +16,48 @@ class LockedItemsRegionsTest(MedievilTestBase):
         "progression_option": ProgressionOptions.OPEN,
     }
 
-    def test_locked_items_dc_has_no_rule_and_is_always_open(self) -> None:
+    def test_locked_items_dc_only_needs_dans_crypt_cleared(self) -> None:
         """
-        Unlike the other four "Locked Items" regions, nothing in Rules.py ever calls
-        set_rule/add_rule on "Dan's Crypt -> Locked Items DC". It keeps the default
-        `lambda state: True` assigned at the top of set_rules(), so it's reachable
-        unconditionally as soon as Dan's Crypt is (i.e. from the start of the game).
+        "Dan's Crypt -> Dan's Crypt Locked Items" requires cleared("Dan's Crypt"), which
+        needs no items, so the region is reachable from the start of the game.
         """
-        self.assertTrue(self.can_reach_region("Locked Items DC"))
+        self.assertTrue(self.can_reach_region("Dan's Crypt Locked Items"))
 
-    def test_locked_items_ch_requires_reaching_cemetery_hill_which_needs_club_or_hammer(self) -> None:
-        """
-        "Cemetery Hill -> Locked Items CH" itself accepts Daring Dash OR Club OR Hammer,
-        but Cemetery Hill (the parent region) can only be entered with Club or Hammer.
-        Since either of those already satisfies the Locked Items CH check too, Daring
-        Dash never actually functions as an independent path to this region: by the
-        time you can reach the entrance at all, you already hold an item that trivially
-        satisfies its own rule.
-        """
-        self.assertFalse(self.can_reach_region("Locked Items CH"))
+    def test_locked_items_ch_requires_club_or_hammer(self) -> None:
+        self.assertFalse(self.can_reach_region("Cemetery Hill Locked Items"))
         self.collect_by_name("Skill: Daring Dash")
-        self.assertFalse(self.can_reach_region("Locked Items CH"))
+        self.assertFalse(self.can_reach_region("Cemetery Hill Locked Items"))
+        self.collect_by_name("Equipment: Club")
+        self.assertTrue(self.can_reach_region("Cemetery Hill Locked Items"))
+
+    def test_locked_items_ch_accepts_hammer(self) -> None:
+        self.assertFalse(self.can_reach_region("Cemetery Hill Locked Items"))
         self.collect_by_name("Equipment: Hammer")
-        self.assertTrue(self.can_reach_region("Locked Items CH"))
+        self.assertTrue(self.can_reach_region("Cemetery Hill Locked Items"))
 
     def test_locked_items_hm_requires_sheet_music(self) -> None:
-        self.assertFalse(self.can_reach_region("Locked Items HM"))
+        self.assertFalse(self.can_reach_region("The Hilltop Mausoleum Locked Items"))
         self.collect_by_name("Key Item: Sheet Music")
-        self.assertTrue(self.can_reach_region("Locked Items HM"))
+        self.assertTrue(self.can_reach_region("The Hilltop Mausoleum Locked Items"))
+
+    def test_locked_items_rtg_requires_skull_key(self) -> None:
+        self.assertFalse(self.can_reach_region("Return to the Graveyard Locked Items"))
+        self.collect_by_name("Key Item: Skull Key")
+        self.assertTrue(self.can_reach_region("Return to the Graveyard Locked Items"))
 
     def test_locked_items_sf_requires_harvester_parts(self) -> None:
-        self.assertFalse(self.can_reach_region("Locked Items SF"))
+        self.assertFalse(self.can_reach_region("Scarecrow Fields Locked Items"))
         self.collect_by_name("Key Item: Harvester Parts")
-        self.assertTrue(self.can_reach_region("Locked Items SF"))
+        self.assertTrue(self.can_reach_region("Scarecrow Fields Locked Items"))
 
     def test_locked_items_sv_requires_crucifix(self) -> None:
-        self.assertFalse(self.can_reach_region("Locked Items SV"))
+        self.assertFalse(self.can_reach_region("The Sleeping Village Locked Items"))
         self.collect_by_name("Key Item: Crucifix")
-        self.assertTrue(self.can_reach_region("Locked Items SV"))
+        self.assertTrue(self.can_reach_region("The Sleeping Village Locked Items"))
+
+    def test_locked_items_ee_requires_shadow_talisman_and_artefact(self) -> None:
+        self.assertFalse(self.can_reach_region("Enchanted Earth Locked Items"))
+        self.collect_by_name("Key Item: Shadow Talisman")
+        self.assertFalse(self.can_reach_region("Enchanted Earth Locked Items"))
+        self.collect_by_name("Key Item: Shadow Artefact")
+        self.assertTrue(self.can_reach_region("Enchanted Earth Locked Items"))
